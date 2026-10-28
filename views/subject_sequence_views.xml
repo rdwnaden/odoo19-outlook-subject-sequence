@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_os_department_list" model="ir.ui.view">
+    <field name="name">outlook.subject.department.list</field><field name="model">outlook.subject.department</field>
+    <field name="arch" type="xml"><list><field name="name"/><field name="code"/><field name="active"/></list></field>
+  </record>
+  <record id="view_os_department_form" model="ir.ui.view">
+    <field name="name">outlook.subject.department.form</field><field name="model">outlook.subject.department</field>
+    <field name="arch" type="xml"><form><sheet><group><field name="name"/><field name="code"/><field name="active"/></group></sheet></form></field>
+  </record>
+  <record id="view_os_doctype_list" model="ir.ui.view">
+    <field name="name">outlook.subject.document.type.list</field><field name="model">outlook.subject.document.type</field>
+    <field name="arch" type="xml"><list><field name="name"/><field name="code"/><field name="active"/></list></field>
+  </record>
+  <record id="view_os_doctype_form" model="ir.ui.view">
+    <field name="name">outlook.subject.document.type.form</field><field name="model">outlook.subject.document.type</field>
+    <field name="arch" type="xml"><form><sheet><group><field name="name"/><field name="code"/><field name="active"/></group></sheet></form></field>
+  </record>
+  <record id="view_os_config_list" model="ir.ui.view">
+    <field name="name">outlook.subject.sequence.config.list</field><field name="model">outlook.subject.sequence.config</field>
+    <field name="arch" type="xml"><list><field name="name"/><field name="department_id"/><field name="document_type_id"/><field name="sequence_id"/><field name="prefix"/><field name="active"/></list></field>
+  </record>
+  <record id="view_os_config_form" model="ir.ui.view">
+    <field name="name">outlook.subject.sequence.config.form</field><field name="model">outlook.subject.sequence.config</field>
+    <field name="arch" type="xml"><form><sheet><group><field name="name" readonly="1"/><field name="department_id"/><field name="document_type_id"/><field name="sequence_id"/><field name="prefix"/><field name="active"/></group></sheet></form></field>
+  </record>
+  <record id="view_os_request_list" model="ir.ui.view">
+    <field name="name">outlook.subject.request.list</field><field name="model">outlook.subject.request</field>
+    <field name="arch" type="xml"><list create="0" edit="0" delete="0"><field name="create_date"/><field name="department_id"/><field name="document_type_id"/><field name="external_reference"/><field name="subject_number"/><field name="requested_by"/><field name="idempotency_key"/></list></field>
+  </record>
+  <record id="view_os_audit_list" model="ir.ui.view">
+    <field name="name">outlook.subject.audit.list</field><field name="model">outlook.subject.audit</field>
+    <field name="arch" type="xml"><list create="0" edit="0" delete="0"><field name="create_date"/><field name="event"/><field name="department_code"/><field name="document_type_code"/><field name="external_reference"/><field name="subject_number"/><field name="idempotency_key_hash"/><field name="client_ip"/><field name="details"/></list></field>
+  </record>
+  <record id="action_os_departments" model="ir.actions.act_window"><field name="name">Departments</field><field name="res_model">outlook.subject.department</field><field name="view_mode">list,form</field></record>
+  <record id="action_os_doctypes" model="ir.actions.act_window"><field name="name">Document Types</field><field name="res_model">outlook.subject.document.type</field><field name="view_mode">list,form</field></record>
+  <record id="action_os_configs" model="ir.actions.act_window"><field name="name">Sequence Configurations</field><field name="res_model">outlook.subject.sequence.config</field><field name="view_mode">list,form</field></record>
+  <record id="action_os_requests" model="ir.actions.act_window"><field name="name">Issued Numbers</field><field name="res_model">outlook.subject.request</field><field name="view_mode">list</field></record>
+  <record id="action_os_audits" model="ir.actions.act_window"><field name="name">API Audit</field><field name="res_model">outlook.subject.audit</field><field name="view_mode">list</field></record>
+  <menuitem id="menu_os_root" name="Outlook Subject Sequence" sequence="80" groups="base.group_system"/>
+  <menuitem id="menu_os_departments" name="Departments" parent="menu_os_root" action="action_os_departments" sequence="10"/>
+  <menuitem id="menu_os_doctypes" name="Document Types" parent="menu_os_root" action="action_os_doctypes" sequence="20"/>
+  <menuitem id="menu_os_configs" name="Sequence Configurations" parent="menu_os_root" action="action_os_configs" sequence="30"/>
+  <menuitem id="menu_os_requests" name="Issued Numbers" parent="menu_os_root" action="action_os_requests" sequence="40"/>
+  <menuitem id="menu_os_audits" name="API Audit" parent="menu_os_root" action="action_os_audits" sequence="50"/>
+</odoo>

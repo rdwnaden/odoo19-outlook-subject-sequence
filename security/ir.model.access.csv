@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_os_department_user,os department user,model_outlook_subject_department,base.group_user,1,0,0,0
+access_os_doctype_user,os doctype user,model_outlook_subject_document_type,base.group_user,1,0,0,0
+access_os_config_user,os config user,model_outlook_subject_sequence_config,base.group_user,1,0,0,0
+access_os_department_admin,os department admin,model_outlook_subject_department,base.group_system,1,1,1,1
+access_os_doctype_admin,os doctype admin,model_outlook_subject_document_type,base.group_system,1,1,1,1
+access_os_config_admin,os config admin,model_outlook_subject_sequence_config,base.group_system,1,1,1,1
+access_os_request_admin,os request admin,model_outlook_subject_request,base.group_system,1,0,0,0
+access_os_audit_admin,os audit admin,model_outlook_subject_audit,base.group_system,1,0,0,0
