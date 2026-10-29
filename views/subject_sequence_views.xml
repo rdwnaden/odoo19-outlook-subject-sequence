@@ -37,7 +37,7 @@
   <record id="action_os_configs" model="ir.actions.act_window"><field name="name">Sequence Configurations</field><field name="res_model">outlook.subject.sequence.config</field><field name="view_mode">list,form</field></record>
   <record id="action_os_requests" model="ir.actions.act_window"><field name="name">Issued Numbers</field><field name="res_model">outlook.subject.request</field><field name="view_mode">list</field></record>
   <record id="action_os_audits" model="ir.actions.act_window"><field name="name">API Audit</field><field name="res_model">outlook.subject.audit</field><field name="view_mode">list</field></record>
-  <menuitem id="menu_os_root" name="Outlook Subject Sequence" sequence="80" groups="base.group_system"/>
+  <menuitem id="menu_os_root" name="Outlook Subject Sequence" sequence="80" groups="base.group_system" web_icon="outlook_subject_sequence,static/description/icon.png"/>
   <menuitem id="menu_os_departments" name="Departments" parent="menu_os_root" action="action_os_departments" sequence="10"/>
   <menuitem id="menu_os_doctypes" name="Document Types" parent="menu_os_root" action="action_os_doctypes" sequence="20"/>
   <menuitem id="menu_os_configs" name="Sequence Configurations" parent="menu_os_root" action="action_os_configs" sequence="30"/>
