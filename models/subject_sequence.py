@@ -54,12 +54,12 @@ class OutlookSubjectMonthlyCounter(models.Model):
     period = fields.Char(required=True, index=True)
     number = fields.Integer(required=True, default=0)
 
-    config_period_unique = models.Constraint(
-    "UNIQUE(config_id, period)",
-    "Only one counter per configuration and period.",
+    _config_period_unique = models.Constraint(
+        "UNIQUE(config_id, period)",
+        "Only one counter per configuration and period.",
     )
 
-    number_positive = models.Constraint(
+    _number_positive = models.Constraint(
         "CHECK(number >= 0)",
         "Counter number must be zero or greater.",
     )
