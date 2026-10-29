@@ -40,6 +40,35 @@ class OutlookSubjectDocumentType(models.Model):
         return super().write(vals)
 
 
+class OutlookSubjectMonthlyCounter(models.Model):
+    _name = "outlook.subject.monthly.counter"
+    _description = "Outlook Subject Monthly Counter"
+    _order = "period desc, config_id"
+
+    config_id = fields.Many2one(
+        "outlook.subject.sequence.config",
+        required=True,
+        ondelete="restrict",
+        index=True,
+    )
+    period = fields.Char(required=True, index=True)
+    number = fields.Integer(required=True, default=0)
+
+    _sql_constraints = [
+        (
+            "config_period_unique",
+            "unique(config_id, period)",
+            "Only one counter per configuration and month.",
+        ),
+        (
+            "number_positive",
+            "check(number >= 0)",
+            "Counter cannot be negative.",
+        ),
+    ]
+
+
+
 class OutlookSubjectSequenceConfig(models.Model):
     _name = "outlook.subject.sequence.config"
     _description = "Outlook Subject Sequence Configuration"
@@ -62,6 +91,7 @@ class OutlookSubjectSequenceConfig(models.Model):
             rec.name = "%s / %s" % (rec.department_id.name or "", rec.document_type_id.name or "")
 
     
+
     def generate_number(self):
         self.ensure_one()
 
@@ -72,25 +102,74 @@ class OutlookSubjectSequenceConfig(models.Model):
         ):
             raise UserError(_("Sequence configuration is inactive."))
 
-        number = self.sequence_id.next_by_id()
         today = fields.Date.context_today(self)
-
         year = today.strftime("%Y")
         month = today.strftime("%m")
+        period = today.strftime("%Y-%m")
 
         prefix = self.prefix or ""
         prefix = prefix.replace("%(year)s", year)
         prefix = prefix.replace("%(month)s", month)
         prefix = prefix.replace(
             "%(department)s",
-            self.department_id.code
+            self.department_id.code,
         )
         prefix = prefix.replace(
             "%(doctype)s",
-            self.document_type_id.name
+            self.document_type_id.name,
         )
 
-        return prefix + number
+        # Cari nomor tertinggi yang sudah pernah diterbitkan
+        # untuk konfigurasi dan prefix yang sama.
+        self.env.cr.execute("""
+            SELECT COALESCE(
+                MAX(substring(subject_number FROM '([0-9]+)$')::integer),
+                0
+            )
+            FROM outlook_subject_request
+            WHERE department_id = %s
+            AND document_type_id = %s
+            AND left(subject_number, length(%s)) = %s
+            AND subject_number ~ '[0-9]+$'
+        """, (
+            self.department_id.id,
+            self.document_type_id.id,
+            prefix,
+            prefix,
+        ))
+
+        last_number = self.env.cr.fetchone()[0] or 0
+        initial_number = last_number + 1
+
+        # Buat counter pertama kali atau naikkan counter secara atomik.
+        # Jika dua request bersamaan, PostgreSQL akan mengurutkannya.
+        self.env.cr.execute("""
+            INSERT INTO outlook_subject_monthly_counter
+                (config_id, period, number,
+                create_uid, create_date, write_uid, write_date)
+            VALUES (%s, %s, %s, %s, NOW(), %s, NOW())
+            ON CONFLICT (config_id, period)
+            DO UPDATE SET
+                number = outlook_subject_monthly_counter.number + 1,
+                write_uid = EXCLUDED.write_uid,
+                write_date = NOW()
+            RETURNING number
+        """, (
+            self.id,
+            period,
+            initial_number,
+            self.env.uid,
+            self.env.uid,
+        ))
+
+        next_number = self.env.cr.fetchone()[0]
+
+        # Gunakan padding dari ir.sequence yang sudah dikonfigurasi.
+        padding = self.sequence_id.padding or 5
+        number_string = str(next_number).zfill(padding)
+
+        return prefix + number_string
+
 
 
 
