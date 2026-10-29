@@ -54,18 +54,15 @@ class OutlookSubjectMonthlyCounter(models.Model):
     period = fields.Char(required=True, index=True)
     number = fields.Integer(required=True, default=0)
 
-    _sql_constraints = [
-        (
-            "config_period_unique",
-            "unique(config_id, period)",
-            "Only one counter per configuration and month.",
-        ),
-        (
-            "number_positive",
-            "check(number >= 0)",
-            "Counter cannot be negative.",
-        ),
-    ]
+    config_period_unique = models.Constraint(
+    "UNIQUE(config_id, period)",
+    "Only one counter per configuration and period.",
+    )
+
+    number_positive = models.Constraint(
+        "CHECK(number >= 0)",
+        "Counter number must be zero or greater.",
+    )
 
 
 
@@ -123,17 +120,27 @@ class OutlookSubjectSequenceConfig(models.Model):
         # untuk konfigurasi dan prefix yang sama.
         self.env.cr.execute("""
             SELECT COALESCE(
-                MAX(substring(subject_number FROM '([0-9]+)$')::integer),
+                MAX(
+                    substring(
+                        subject_number
+                        FROM length(%s) + 1
+                    )::bigint
+                ),
                 0
             )
             FROM outlook_subject_request
             WHERE department_id = %s
-            AND document_type_id = %s
-            AND left(subject_number, length(%s)) = %s
-            AND subject_number ~ '[0-9]+$'
+              AND document_type_id = %s
+              AND left(subject_number, length(%s)) = %s
+              AND substring(
+                    subject_number
+                    FROM length(%s) + 1
+                  ) ~ '^[0-9]+$'
         """, (
+            prefix,
             self.department_id.id,
             self.document_type_id.id,
+            prefix,
             prefix,
             prefix,
         ))
