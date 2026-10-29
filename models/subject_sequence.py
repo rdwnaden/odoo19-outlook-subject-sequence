@@ -61,6 +61,7 @@ class OutlookSubjectSequenceConfig(models.Model):
         for rec in self:
             rec.name = "%s / %s" % (rec.department_id.name or "", rec.document_type_id.name or "")
 
+    
     def generate_number(self):
         self.ensure_one()
 
@@ -72,9 +73,14 @@ class OutlookSubjectSequenceConfig(models.Model):
             raise UserError(_("Sequence configuration is inactive."))
 
         number = self.sequence_id.next_by_id()
-        year = fields.Date.context_today(self).strftime("%Y")
+        today = fields.Date.context_today(self)
 
-        prefix = (self.prefix or "").replace("%(year)s", year)
+        year = today.strftime("%Y")
+        month = today.strftime("%m")
+
+        prefix = self.prefix or ""
+        prefix = prefix.replace("%(year)s", year)
+        prefix = prefix.replace("%(month)s", month)
         prefix = prefix.replace(
             "%(department)s",
             self.department_id.code
@@ -85,6 +91,7 @@ class OutlookSubjectSequenceConfig(models.Model):
         )
 
         return prefix + number
+
 
 
 class OutlookSubjectRequest(models.Model):
