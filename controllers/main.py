@@ -94,7 +94,7 @@ class OutlookSubjectSequenceController(http.Controller):
             with request.env.cr.savepoint():
                 number = config.generate_number()
                 result = {"ok": True, "subject_number": number, "department_code": dept,
-                          "document_type_code": doc_type, "external_reference": external or None,
+                          "document_type_code": doc_type, "document_type_name": document_type.name, "external_reference": external or None,
                           "idempotent_replay": False}
                 Request.create({"idempotency_key": key, "payload_hash": payload_hash,
                                 "department_id": department.id, "document_type_id": document_type.id,

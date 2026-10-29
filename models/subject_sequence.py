@@ -63,13 +63,27 @@ class OutlookSubjectSequenceConfig(models.Model):
 
     def generate_number(self):
         self.ensure_one()
-        if not self.active or not self.department_id.active or not self.document_type_id.active:
+
+        if (
+            not self.active
+            or not self.department_id.active
+            or not self.document_type_id.active
+        ):
             raise UserError(_("Sequence configuration is inactive."))
+
         number = self.sequence_id.next_by_id()
         year = fields.Date.context_today(self).strftime("%Y")
+
         prefix = (self.prefix or "").replace("%(year)s", year)
-        prefix = prefix.replace("%(department)s", self.department_id.code)
-        prefix = prefix.replace("%(doctype)s", self.document_type_id.code)
+        prefix = prefix.replace(
+            "%(department)s",
+            self.department_id.code
+        )
+        prefix = prefix.replace(
+            "%(doctype)s",
+            self.document_type_id.name
+        )
+
         return prefix + number
 
 
